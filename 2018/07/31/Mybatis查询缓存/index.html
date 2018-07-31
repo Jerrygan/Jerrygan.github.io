@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Jerry的博客">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        Mybatis查询缓存 - Jerry的博客 | Jerry&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> change code </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>Jerry</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一级缓存"><span class="toc-text">一级缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二级缓存"><span class="toc-text">二级缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+        <div class="index-about-mobile">
+            <i> change code </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        Mybatis查询缓存
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2018-07-31 17:14:14</span></span>
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h3 id="一级缓存"><a href="#一级缓存" class="headerlink" title="一级缓存"></a>一级缓存</h3><p>一级缓存作用范围在sqlSession，在同一个sqlSession中如果执行两次同样的sql查询，第一次会将查询的数据存储在HashMap缓存，第二次之后的查询便不会数据库读取数据，直接在缓存中取，从而提高查询效率；当一个sqlSession结束后该sqlSession中的一级缓存也就不存在了。Mybatis默认开启一级缓存。如果在sqlSession有执行增删改操作，执行commit()，会清空一级缓存。<br>断点位置是缓存数据key的结构，以及查询逻辑<br><img src="/2018/07/31/Mybatis查询缓存/1.png" title="缓存数据的key"><br><img src="/2018/07/31/Mybatis查询缓存/2.png" title="缓存数据的操作"><br>测试数据<br><img src="/2018/07/31/Mybatis查询缓存/3.png"><br>控制台输出结果：（第二次查询直接从缓存取出）<br><img src="/2018/07/31/Mybatis查询缓存/4.png"><br>这里SqlSessionFactory的openSession()自动提交是关闭的，commit()方法在增删改操作需要执行提交事务；<br><img src="/2018/07/31/Mybatis查询缓存/5.png"><br>另外，在测试注释了这句：<br><img src="/2018/07/31/Mybatis查询缓存/6.png"><br>没有执行commit()控制台输出结果：<br><img src="/2018/07/31/Mybatis查询缓存/7.png"><br>这里要知道,在数据库事务是指作为单个逻辑工作单元执行的一系列操作,要么完全地执行,要么完全地不执行，用以维护数据库的完整性。即是，在统一个单元中（事务），update执行，执行select查出来的肯定是update的数据，同一个事务没有隔离性，如果另一个单元就select不到这个update的数据，因为update的数据还没提交，只在该单元中有效。</p>
+<h3 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h3><p>Mybatis二级缓存多个sqlSession共享，这里说的二级缓存划分以mapper.xml 定义的namespace划分，所以一样的mapper下的不同sql查询的数据放在一个缓存区域，存储结构还是HashMap，每次查询还是会先从缓存区域找，如果找不到从数据库查询，查询到数据将数据写入缓存区域，一样的，sqlSession执行insert、update、delete等操作commit提交后会清空缓存区域。<br>Mybatis的二级缓存是需要自己开启的，在配置文件加上<br><img src="/2018/07/31/Mybatis查询缓存/8.png"><br>还需要具体在每个mapper.xml文件加上，开启二级缓存<br><img src="/2018/07/31/Mybatis查询缓存/9.png"><br>可以增加缓存元素的属性<br><img src="/2018/07/31/Mybatis查询缓存/10.png"><br>对查询结果映射的pojo对象需要实现序列化接口（java.io.Serializable）</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>应用场景：多在对数据要求实时性不高但访问查询请求多的查询结果，金额已利用二级缓存降低数据库访问量，提高访问速度，例如统计分析，可以设置刷新间隔时间<br><img src="/2018/07/31/Mybatis查询缓存/11.png"><br>局限性：Mybatis的一级缓存、二级缓存都没具体到对某个单元数据的缓存，就耳机缓存来说，如果在执行增删改的事务提交commit()之前对很多数据查询了，已经写入缓存，这时候对某个数据的增删改执行commit()会刷新缓存，即是清空缓存区域的所有缓存数据。<br>Mybatis提供二级缓存Cache接口，支持整合比如ehcache、memcache、redis等第三方的缓存数据库。</p>
+
+        
+        <div id="comment-container">
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+</html>
